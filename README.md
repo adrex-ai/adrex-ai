@@ -1,7 +1,7 @@
 <p align="center">
   <h1 align="center">Adrex AI</h1>
   <p align="center">
-    <strong>Open-source MCP server for Google Ads & Meta Ads</strong>
+    <strong>MCP server for Google Ads & Meta Ads</strong>
   </p>
   <p align="center">
     Manage your ad campaigns from Claude, ChatGPT, Cursor, or any MCP-compatible AI assistant.
@@ -18,40 +18,38 @@
 
 ## What is Adrex AI?
 
-Adrex AI is an MCP (Model Context Protocol) server that connects AI assistants directly to Google Ads and Meta Ads APIs. Instead of navigating complex dashboards, you manage campaigns through natural language conversation.
+Adrex AI is an MCP (Model Context Protocol) server that connects AI assistants to your Google Ads and Meta Ads accounts. Instead of navigating complex dashboards, you manage campaigns through natural language.
 
 ```
 You: "Show me my Google Ads performance for the last 7 days"
-Claude: [calls google_ads_campaign_performance] → shows table with spend, clicks, CTR, ROAS
+Claude: [calls google_ads_campaign_performance] → table with spend, clicks, CTR, ROAS
 
-You: "Pause the campaign with the lowest ROAS"  
+You: "Pause the campaign with the lowest ROAS"
 Claude: [calls google_ads_pause_campaign] → campaign paused, no more spend
 
 You: "Create a Meta campaign for our summer sale, $50/day budget"
 Claude: [calls meta_ads_create_campaign] → campaign created PAUSED for your review
 ```
 
+You connect your ad accounts once in the [Adrex dashboard](https://adrex.ai) (secure OAuth — your tokens stay on our servers, never in the MCP client), then drive everything from your AI assistant with a single API key.
+
 ### Safety First
 
-These tools operate on **real ad accounts** that spend **real money**. We take that seriously:
+These tools operate on **real ad accounts** that spend **real money**:
 
-- All campaigns are created **PAUSED** — no money spent until you explicitly resume
-- Destructive actions (delete, resume) include confirmation warnings
+- All campaigns and ads are created **PAUSED** — no spend until you explicitly resume
+- Destructive and spend-starting actions return clear warnings
 - Read operations (metrics, lists) run freely without side effects
-- Authentication via OAuth — no credentials stored by the MCP server
-- Fully open source — audit every line of code
 
 ## Quick Start
 
-### Install via npx (no setup needed)
+### 1. Get your API key
+Sign up at **[adrex.ai](https://adrex.ai)**, connect your Google/Meta ad accounts in **Settings**, and generate an **API key**.
 
-```bash
-npx adrex-ai
-```
+### 2. Add the server to your AI assistant
 
-### Claude Desktop
-
-Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json`):
+**Claude Desktop** (`~/Library/Application Support/Claude/claude_desktop_config.json`)
+or **Cursor** (`.cursor/mcp.json`):
 
 ```json
 {
@@ -60,50 +58,21 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
       "command": "npx",
       "args": ["-y", "adrex-ai"],
       "env": {
-        "GOOGLE_ADS_CLIENT_ID": "your-client-id",
-        "GOOGLE_ADS_CLIENT_SECRET": "your-client-secret",
-        "GOOGLE_ADS_DEVELOPER_TOKEN": "your-developer-token",
-        "GOOGLE_ADS_REFRESH_TOKEN": "your-refresh-token",
-        "META_ADS_APP_ID": "your-app-id",
-        "META_ADS_APP_SECRET": "your-app-secret",
-        "META_ADS_ACCESS_TOKEN": "your-access-token"
+        "ADREX_API_KEY": "your-api-key"
       }
     }
   }
 }
 ```
 
-### Cursor
-
-Add the same config to `.cursor/mcp.json` in your project root.
-
-### Claude Code
-
+**Claude Code:**
 ```bash
-claude mcp add adrex-ai -- npx -y adrex-ai
+claude mcp add adrex-ai -e ADREX_API_KEY=your-api-key -- npx -y adrex-ai
 ```
 
-## Credential Setup
+That's it — no SDK setup, no developer tokens, no OAuth juggling. The server forwards each request to the Adrex backend, which uses the ad-account credentials you connected in the dashboard.
 
-### Google Ads
-
-1. Create a project in [Google Cloud Console](https://console.cloud.google.com/)
-2. Enable the Google Ads API
-3. Create OAuth 2.0 credentials (Desktop app type)
-4. Apply for a [Developer Token](https://developers.google.com/google-ads/api/docs/get-started/dev-token)
-5. Generate a refresh token using the OAuth playground or the built-in OAuth flow
-
-See [docs/setup-google.md](docs/setup-google.md) for detailed steps.
-
-### Meta Ads
-
-1. Create an app at [Meta for Developers](https://developers.facebook.com/)
-2. Add the Marketing API product
-3. Generate a long-lived access token with `ads_management` and `ads_read` permissions
-
-See [docs/setup-meta.md](docs/setup-meta.md) for detailed steps.
-
-> You can configure just one platform — Google-only or Meta-only setups work fine.
+> **Behind a corporate proxy?** v1.0.4+ automatically routes through `HTTP_PROXY` / `HTTPS_PROXY`.
 
 ## Tools
 
@@ -207,7 +176,7 @@ See [docs/setup-meta.md](docs/setup-meta.md) for detailed steps.
 ### Cross-Platform (1 tool)
 | Tool | Description |
 |---|---|
-| `list_connected_platforms` | Check which platforms are configured |
+| `list_connected_platforms` | Check which platforms are connected and your usage |
 
 ## Use Cases
 
@@ -221,62 +190,28 @@ See [docs/setup-meta.md](docs/setup-meta.md) for detailed steps.
 > "Show me keywords in my 'Brand Terms' ad group. Pause any with quality score below 5."
 
 **Budget Control**
-> "Increase the budget on my top-performing campaign by 20% and pause the one that's been losing money."
-
-**Competitive Intelligence**
-> "Show me auction insights for my main Search campaign — who am I competing against?"
+> "Increase the budget on my top-performing campaign by 20% and pause the one that's losing money."
 
 ## Want More?
 
-The open-source MCP server gives you full campaign management. For AI-powered optimization, creative generation, and visual analytics, check out the [Adrex AI Platform](https://adrex.ai):
+The MCP server gives you full campaign management from chat. The [Adrex AI Platform](https://adrex.ai) adds:
 
 - **AI Campaign Agent** — autonomous optimization with guardrails and rollback
 - **Creative Studio** — AI-generated ad copy and images
-- **A/B Testing** — native platform experiments with statistical analysis
+- **A/B Testing** — native platform experiments
 - **Competitor Intelligence** — track competitor ads across Google and Meta
 - **Budget Rules Engine** — automated rules with natural language parsing
 - **Visual Dashboard** — interactive charts, breakdowns, and time-series
-
-## Development
-
-```bash
-# Clone the repo
-git clone https://github.com/adrex-ai/adrex-ai.git
-cd adrex-ai
-
-# Install dependencies
-npm install
-
-# Run in development mode
-npm run dev
-
-# Build for production
-npm run build
-
-# Type check
-npm run typecheck
-```
-
-## Contributing
-
-We welcome contributions! Please:
-
-1. Fork the repo
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
-
-## License
-
-MIT License — see [LICENSE](LICENSE) for details.
 
 ## Links
 
 - [Adrex AI Platform](https://adrex.ai)
 - [Documentation](https://docs.adrex.ai)
 - [Discord Community](https://discord.gg/adrex)
-- [Twitter/X](https://x.com/adrex_ai)
+
+## License
+
+MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 

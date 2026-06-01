@@ -1,4 +1,4 @@
-import { loadMetaAdsCredentials } from "../auth/meta-oauth.js";
+import { loadMetaAdsCredentials } from "../../auth/meta-oauth.js";
 
 const GRAPH_URL = "https://graph.facebook.com/v21.0";
 

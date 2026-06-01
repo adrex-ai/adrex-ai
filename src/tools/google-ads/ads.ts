@@ -1,5 +1,5 @@
 import { GoogleAdsApi, enums } from "google-ads-api";
-import { loadGoogleAdsCredentials } from "../auth/google-oauth.js";
+import { loadGoogleAdsCredentials } from "../../auth/google-oauth.js";
 
 function getCustomer(customerId: string) {
   const creds = loadGoogleAdsCredentials();
@@ -104,7 +104,7 @@ export async function createResponsiveSearchAd(
     },
   ]);
 
-  const adId = result.results[0].resource_name.split("/").pop();
+  const adId = result.results?.[0]?.resource_name?.split("/").pop() ?? "unknown";
 
   return [
     `## Responsive Search Ad Created`,

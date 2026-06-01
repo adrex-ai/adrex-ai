@@ -8,7 +8,7 @@
   </p>
   <p align="center">
     <a href="#quick-start">Quick Start</a> |
-    <a href="#tools">60 Tools</a> |
+    <a href="#tools">56 Tools</a> |
     <a href="https://adrex.ai">Platform</a> |
     <a href="https://discord.gg/adrex">Discord</a>
   </p>

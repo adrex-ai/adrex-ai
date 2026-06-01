@@ -1,5 +1,5 @@
 import { GoogleAdsApi, enums } from "google-ads-api";
-import { loadGoogleAdsCredentials, type GoogleAdsCredentials } from "../auth/google-oauth.js";
+import { loadGoogleAdsCredentials, type GoogleAdsCredentials } from "../../auth/google-oauth.js";
 
 let clientInstance: GoogleAdsApi | null = null;
 
@@ -211,8 +211,8 @@ export async function createSearchCampaign(
     : {};
 
   const result = await customer.campaigns.create([campaignData]);
-  const campaignResourceName = result.results[0].resource_name;
-  const newCampaignId = campaignResourceName.split("/").pop();
+  const campaignResourceName = result.results?.[0]?.resource_name ?? "";
+  const newCampaignId = campaignResourceName.split("/").pop() ?? "unknown";
 
   return [
     `## Campaign Created Successfully`,

@@ -1,5 +1,5 @@
 import { GoogleAdsApi } from "google-ads-api";
-import { loadGoogleAdsCredentials } from "../auth/google-oauth.js";
+import { loadGoogleAdsCredentials } from "../../auth/google-oauth.js";
 
 function getCustomer(customerId: string) {
   const creds = loadGoogleAdsCredentials();

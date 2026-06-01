@@ -42,7 +42,7 @@ function makeHandler(toolName: string) {
 
 const server = new McpServer({
   name: "adrex-ai",
-  version: "1.0.5",
+  version: "1.0.6",
 });
 
 function tool(
@@ -389,7 +389,7 @@ server.registerTool(
         `| Google Ads | ${g} |`,
         `| Meta Ads | ${m} |`,
         ``,
-        `**Usage today:** ${usage?.calls_today ?? 0} / ${usage?.limit ?? "?"} calls`,
+        `**Usage this month:** ${usage?.calls_used ?? 0} / ${usage?.limit ?? "?"} calls`,
       ];
       if (!status.google_ads?.connected && !status.meta_ads?.connected) {
         lines.push(``, `Connect your ad accounts at https://adrex.ai/settings`);

@@ -10,7 +10,18 @@ try {
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { setGlobalDispatcher, EnvHttpProxyAgent } from "undici";
 import { z } from "zod";
+
+// Node's built-in fetch (undici) ignores HTTP(S)_PROXY env vars by default.
+// In proxied/corporate networks that makes every outbound call fail. Route
+// fetch through the proxy when one is configured.
+if (
+  process.env.HTTPS_PROXY || process.env.HTTP_PROXY ||
+  process.env.https_proxy || process.env.http_proxy
+) {
+  setGlobalDispatcher(new EnvHttpProxyAgent());
+}
 
 import * as googleCampaigns from "./tools/google-ads/campaigns.js";
 import * as googleAdGroups from "./tools/google-ads/ad-groups.js";
@@ -53,7 +64,7 @@ function makeHandler(
 
 const server = new McpServer({
   name: "adrex-ai",
-  version: "1.0.3",
+  version: "1.0.4",
 });
 
 // ─── Google Ads: Accounts ───────────────────────────────────────────────────

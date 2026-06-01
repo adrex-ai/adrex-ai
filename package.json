@@ -1,6 +1,6 @@
 {
   "name": "adrex-ai",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Open-source MCP server for managing Google Ads & Meta Ads from AI assistants like Claude, ChatGPT, and Cursor. 54 tools for campaign management, reporting, keywords, targeting, and more.",
   "type": "module",
   "bin": {
@@ -47,17 +47,18 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "google-ads-api": "^17.0.0",
     "facebook-nodejs-business-sdk": "^21.0.0",
+    "google-ads-api": "^17.0.0",
     "googleapis": "^144.0.0",
     "open": "^10.1.0",
+    "undici": "^7.27.0",
     "zod": "^3.24.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "eslint": "^9.0.0",
     "tsx": "^4.19.0",
-    "typescript": "^5.7.0",
-    "eslint": "^9.0.0"
+    "typescript": "^5.7.0"
   },
   "files": [
     "dist/",

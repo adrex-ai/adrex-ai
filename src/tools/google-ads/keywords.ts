@@ -1,5 +1,6 @@
 import { GoogleAdsApi, enums } from "google-ads-api";
 import { loadGoogleAdsCredentials } from "../../auth/google-oauth.js";
+import { numericId } from "../../utils/validate.js";
 
 function getCustomer(customerId: string) {
   const creds = loadGoogleAdsCredentials();
@@ -35,7 +36,7 @@ export async function listKeywords(
       metrics.ctr,
       metrics.average_cpc
     FROM keyword_view
-    WHERE ad_group.id = ${adGroupId}
+    WHERE ad_group.id = ${numericId(adGroupId, "ad_group_id")}
       AND ad_group_criterion.status != 'REMOVED'
     ORDER BY metrics.impressions DESC
   `);
@@ -73,8 +74,9 @@ export async function addKeywords(
     EXACT: enums.KeywordMatchType.EXACT,
   };
 
+  const safeAdGroupId = numericId(adGroupId, "ad_group_id");
   const operations = keywords.map((kw) => ({
-    ad_group: `customers/${cleanId}/adGroups/${adGroupId}`,
+    ad_group: `customers/${cleanId}/adGroups/${safeAdGroupId}`,
     status: enums.AdGroupCriterionStatus.ENABLED,
     keyword: {
       text: kw.text,
@@ -99,8 +101,9 @@ export async function addNegativeKeywords(
   const customer = getCustomer(customerId);
   const cleanId = customerId.replace(/-/g, "");
 
+  const safeCampaignId = numericId(campaignId, "campaign_id");
   const operations = keywords.map((text) => ({
-    campaign: `customers/${cleanId}/campaigns/${campaignId}`,
+    campaign: `customers/${cleanId}/campaigns/${safeCampaignId}`,
     negative: true,
     keyword: {
       text,
@@ -125,7 +128,7 @@ export async function pauseKeyword(
 
   await customer.adGroupCriteria.update([
     {
-      resource_name: `customers/${cleanId}/adGroupCriteria/${adGroupId}~${criterionId}`,
+      resource_name: `customers/${cleanId}/adGroupCriteria/${numericId(adGroupId, "ad_group_id")}~${numericId(criterionId, "criterion_id")}`,
       status: enums.AdGroupCriterionStatus.PAUSED,
     },
   ]);
@@ -142,7 +145,7 @@ export async function removeKeyword(
   const cleanId = customerId.replace(/-/g, "");
 
   await customer.adGroupCriteria.remove([
-    `customers/${cleanId}/adGroupCriteria/${adGroupId}~${criterionId}`,
+    `customers/${cleanId}/adGroupCriteria/${numericId(adGroupId, "ad_group_id")}~${numericId(criterionId, "criterion_id")}`,
   ]);
 
   return `Keyword ${criterionId} has been **removed**. This action is irreversible.`;

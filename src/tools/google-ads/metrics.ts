@@ -1,5 +1,6 @@
 import { GoogleAdsApi } from "google-ads-api";
 import { loadGoogleAdsCredentials } from "../../auth/google-oauth.js";
+import { numericId } from "../../utils/validate.js";
 
 function getCustomer(customerId: string) {
   const creds = loadGoogleAdsCredentials();
@@ -105,7 +106,7 @@ export async function auctionInsights(
       auction_insight.top_of_page_rate,
       auction_insight.abs_top_of_page_rate
     FROM campaign
-    WHERE campaign.id = ${campaignId}
+    WHERE campaign.id = ${numericId(campaignId, "campaign_id")}
   `);
 
   if (rows.length === 0) return `No auction insights available for campaign ${campaignId}.`;
@@ -143,7 +144,7 @@ export async function getBudget(
       campaign_budget.explicitly_shared,
       metrics.cost_micros
     FROM campaign
-    WHERE campaign.id = ${campaignId}
+    WHERE campaign.id = ${numericId(campaignId, "campaign_id")}
   `);
 
   if (!row) return `Campaign ${campaignId} not found.`;

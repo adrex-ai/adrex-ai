@@ -1,5 +1,32 @@
 import { GoogleAdsApi, enums } from "google-ads-api";
 import { loadGoogleAdsCredentials, type GoogleAdsCredentials } from "../../auth/google-oauth.js";
+import { numericId, customerId as validateCustomerId, enumValue } from "../../utils/validate.js";
+
+const CAMPAIGN_STATUSES = ["ENABLED", "PAUSED", "REMOVED"] as const;
+
+// ISO country code -> Google Ads geo target constant ID. Used to apply
+// location targeting on campaign creation. Extend as needed.
+const GEO_TARGET_CONSTANTS: Record<string, string> = {
+  US: "2840", GB: "2826", UK: "2826", CA: "2124", AU: "2036", IN: "2356",
+  DE: "2276", FR: "2250", ES: "2724", IT: "2380", NL: "2528", IE: "2372",
+  BR: "2076", MX: "2484", AR: "2032", JP: "2392", KR: "2410", SG: "2702",
+  AE: "2784", SA: "2682", ZA: "2710", SE: "2752", NO: "2578", DK: "2208",
+  FI: "2246", PL: "2616", PT: "2620", BE: "2056", CH: "2756", AT: "2040",
+  NZ: "2554", ID: "2360", MY: "2458", PH: "2608", TH: "2764", VN: "2704",
+};
+
+/** Resolve ISO country codes to geo target constant resource names. */
+function resolveGeoTargets(countries: string[]): string[] {
+  return countries.map((code) => {
+    const id = GEO_TARGET_CONSTANTS[code.toUpperCase()];
+    if (!id) {
+      throw new Error(
+        `Unsupported target country "${code}". Supported codes: ${Object.keys(GEO_TARGET_CONSTANTS).join(", ")}.`
+      );
+    }
+    return `geoTargetConstants/${id}`;
+  });
+}
 
 let clientInstance: GoogleAdsApi | null = null;
 
@@ -63,7 +90,7 @@ export async function listCampaigns(
 
   let whereClause = "WHERE campaign.status != 'REMOVED'";
   if (status) {
-    whereClause += ` AND campaign.status = '${status.toUpperCase()}'`;
+    whereClause += ` AND campaign.status = '${enumValue(status, CAMPAIGN_STATUSES, "status")}'`;
   }
 
   const campaigns = await customer.query(`
@@ -114,6 +141,7 @@ export async function getCampaign(
   campaignId: string
 ): Promise<string> {
   const customer = getCustomer(customerId);
+  const safeCampaignId = numericId(campaignId, "campaign_id");
 
   const [row] = await customer.query(`
     SELECT
@@ -133,7 +161,7 @@ export async function getCampaign(
       metrics.ctr,
       metrics.average_cpc
     FROM campaign
-    WHERE campaign.id = ${campaignId}
+    WHERE campaign.id = ${safeCampaignId}
   `);
 
   if (!row) return `Campaign ${campaignId} not found.`;
@@ -177,6 +205,9 @@ export async function createSearchCampaign(
   const customer = getCustomer(customerId);
   const cleanId = customerId.replace(/-/g, "");
 
+  // Validate locations up front so we never create a campaign we can't target.
+  const geoTargets = resolveGeoTargets(targetCountries);
+
   const budget = await customer.campaignBudgets.create([
     {
       name: `${name} Budget - ${Date.now()}`,
@@ -214,6 +245,16 @@ export async function createSearchCampaign(
   const campaignResourceName = result.results?.[0]?.resource_name ?? "";
   const newCampaignId = campaignResourceName.split("/").pop() ?? "unknown";
 
+  // Apply location targeting (previously this argument was silently ignored).
+  if (campaignResourceName && geoTargets.length > 0) {
+    await customer.campaignCriteria.create(
+      geoTargets.map((geo) => ({
+        campaign: campaignResourceName,
+        location: { geo_target_constant: geo },
+      }))
+    );
+  }
+
   return [
     `## Campaign Created Successfully`,
     ``,
@@ -223,6 +264,7 @@ export async function createSearchCampaign(
     `- **Daily Budget:** $${dailyBudget.toFixed(2)}`,
     `- **Bidding Strategy:** ${biddingStrategy}`,
     `- **Type:** Search`,
+    `- **Target Countries:** ${targetCountries.map((c) => c.toUpperCase()).join(", ")}`,
     ``,
     `> Campaign is paused — no money will be spent until you resume it.`,
   ].join("\n");
@@ -279,7 +321,7 @@ export async function updateCampaign(
 
   if (updates.dailyBudget) {
     const [campaign] = await customer.query(`
-      SELECT campaign.campaign_budget FROM campaign WHERE campaign.id = ${campaignId}
+      SELECT campaign.campaign_budget FROM campaign WHERE campaign.id = ${numericId(campaignId, "campaign_id")}
     `);
     if (campaign?.campaign?.campaign_budget) {
       await customer.campaignBudgets.update([
@@ -336,7 +378,7 @@ export async function getCampaignTimeSeries(
       metrics.cost_micros,
       metrics.ctr
     FROM campaign
-    WHERE campaign.id = ${campaignId}
+    WHERE campaign.id = ${numericId(campaignId, "campaign_id")}
       AND segments.date >= '${startStr}'
       AND segments.date <= '${endStr}'
     ORDER BY segments.date
@@ -382,7 +424,7 @@ export async function getCampaignBreakdowns(
       metrics.cost_micros,
       metrics.ctr
     FROM campaign
-    WHERE campaign.id = ${campaignId}
+    WHERE campaign.id = ${numericId(campaignId, "campaign_id")}
       AND campaign.status != 'REMOVED'
   `);
 

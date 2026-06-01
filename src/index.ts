@@ -1,5 +1,13 @@
 #!/usr/bin/env node
 
+// Load a local .env file when present (self-hosted / dev). No-op in hosted mode
+// or when running via an MCP client that injects env vars directly.
+try {
+  process.loadEnvFile();
+} catch {
+  // No .env file — credentials come from the process environment.
+}
+
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
@@ -45,7 +53,7 @@ function makeHandler(
 
 const server = new McpServer({
   name: "adrex-ai",
-  version: "1.0.0",
+  version: "1.0.3",
 });
 
 // ─── Google Ads: Accounts ───────────────────────────────────────────────────
@@ -94,7 +102,7 @@ server.registerTool("google_ads_resume_campaign", {
 server.registerTool("google_ads_delete_campaign", {
   description: "Permanently remove a Google Ads campaign — this action is IRREVERSIBLE",
   inputSchema: { customer_id: z.string().describe("Google Ads customer/account ID"), campaign_id: z.string().describe("Campaign ID to delete") },
-}, makeHandler("google_ads_delete_campaign", async ({ customer_id, campaign_id }) => googleCampaigns.deleteCampaign(customer_id, campaign_id)));
+}, makeHandler("google_ads_delete_campaign", async ({ customer_id, campaign_id }) => `${safetyNotice("delete")}\n\n${await googleCampaigns.deleteCampaign(customer_id, campaign_id)}`));
 
 // ─── Google Ads: Ad Groups ──────────────────────────────────────────────────
 
@@ -121,7 +129,7 @@ server.registerTool("google_ads_pause_ad_group", {
 server.registerTool("google_ads_delete_ad_group", {
   description: "Permanently remove a Google Ads ad group — IRREVERSIBLE",
   inputSchema: { customer_id: z.string().describe("Google Ads customer/account ID"), ad_group_id: z.string().describe("Ad group ID to delete") },
-}, makeHandler("google_ads_delete_ad_group", async ({ customer_id, ad_group_id }) => googleAdGroups.deleteAdGroup(customer_id, ad_group_id)));
+}, makeHandler("google_ads_delete_ad_group", async ({ customer_id, ad_group_id }) => `${safetyNotice("delete")}\n\n${await googleAdGroups.deleteAdGroup(customer_id, ad_group_id)}`));
 
 // ─── Google Ads: Ads ────────────────────────────────────────────────────────
 
@@ -148,7 +156,7 @@ server.registerTool("google_ads_enable_ad", {
 server.registerTool("google_ads_delete_ad", {
   description: "Permanently remove a Google Ads ad — IRREVERSIBLE",
   inputSchema: { customer_id: z.string().describe("Google Ads customer/account ID"), ad_group_id: z.string().describe("Ad group ID"), ad_id: z.string().describe("Ad ID to delete") },
-}, makeHandler("google_ads_delete_ad", async ({ customer_id, ad_group_id, ad_id }) => googleAds.deleteAd(customer_id, ad_group_id, ad_id)));
+}, makeHandler("google_ads_delete_ad", async ({ customer_id, ad_group_id, ad_id }) => `${safetyNotice("delete")}\n\n${await googleAds.deleteAd(customer_id, ad_group_id, ad_id)}`));
 
 // ─── Google Ads: Keywords ───────────────────────────────────────────────────
 
@@ -175,7 +183,7 @@ server.registerTool("google_ads_pause_keyword", {
 server.registerTool("google_ads_remove_keyword", {
   description: "Permanently remove a keyword from a Google Ads ad group — IRREVERSIBLE",
   inputSchema: { customer_id: z.string().describe("Google Ads customer/account ID"), ad_group_id: z.string().describe("Ad group ID"), criterion_id: z.string().describe("Keyword criterion ID") },
-}, makeHandler("google_ads_remove_keyword", async ({ customer_id, ad_group_id, criterion_id }) => googleKeywords.removeKeyword(customer_id, ad_group_id, criterion_id)));
+}, makeHandler("google_ads_remove_keyword", async ({ customer_id, ad_group_id, criterion_id }) => `${safetyNotice("delete")}\n\n${await googleKeywords.removeKeyword(customer_id, ad_group_id, criterion_id)}`));
 
 // ─── Google Ads: Metrics & Reporting ────────────────────────────────────────
 
@@ -246,7 +254,7 @@ server.registerTool("meta_ads_resume_campaign", {
 server.registerTool("meta_ads_delete_campaign", {
   description: "Permanently delete a Meta campaign — IRREVERSIBLE",
   inputSchema: { campaign_id: z.string().describe("Meta campaign ID to delete") },
-}, makeHandler("meta_ads_delete_campaign", async ({ campaign_id }) => metaCampaigns.deleteCampaign(campaign_id)));
+}, makeHandler("meta_ads_delete_campaign", async ({ campaign_id }) => `${safetyNotice("delete")}\n\n${await metaCampaigns.deleteCampaign(campaign_id)}`));
 
 // ─── Meta Ads: Ad Sets ──────────────────────────────────────────────────────
 
@@ -273,7 +281,7 @@ server.registerTool("meta_ads_pause_ad_set", {
 server.registerTool("meta_ads_delete_ad_set", {
   description: "Permanently delete a Meta ad set — IRREVERSIBLE",
   inputSchema: { ad_set_id: z.string().describe("Meta ad set ID to delete") },
-}, makeHandler("meta_ads_delete_ad_set", async ({ ad_set_id }) => metaAdSets.deleteAdSet(ad_set_id)));
+}, makeHandler("meta_ads_delete_ad_set", async ({ ad_set_id }) => `${safetyNotice("delete")}\n\n${await metaAdSets.deleteAdSet(ad_set_id)}`));
 
 // ─── Meta Ads: Ads ──────────────────────────────────────────────────────────
 
@@ -300,7 +308,7 @@ server.registerTool("meta_ads_enable_ad", {
 server.registerTool("meta_ads_delete_ad", {
   description: "Permanently delete a Meta ad — IRREVERSIBLE",
   inputSchema: { ad_id: z.string().describe("Meta ad ID to delete") },
-}, makeHandler("meta_ads_delete_ad", async ({ ad_id }) => metaAds.deleteAd(ad_id)));
+}, makeHandler("meta_ads_delete_ad", async ({ ad_id }) => `${safetyNotice("delete")}\n\n${await metaAds.deleteAd(ad_id)}`));
 
 // ─── Meta Ads: Targeting ────────────────────────────────────────────────────
 

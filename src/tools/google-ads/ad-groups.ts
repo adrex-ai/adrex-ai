@@ -1,5 +1,6 @@
 import { GoogleAdsApi, enums } from "google-ads-api";
 import { loadGoogleAdsCredentials } from "../../auth/google-oauth.js";
+import { numericId } from "../../utils/validate.js";
 
 function getCustomer(customerId: string) {
   const creds = loadGoogleAdsCredentials();
@@ -34,7 +35,7 @@ export async function listAdGroups(
       metrics.cost_micros,
       metrics.ctr
     FROM ad_group
-    WHERE campaign.id = ${campaignId}
+    WHERE campaign.id = ${numericId(campaignId, "campaign_id")}
       AND ad_group.status != 'REMOVED'
     ORDER BY ad_group.name
   `);
@@ -74,7 +75,7 @@ export async function createAdGroup(
   const result = await customer.adGroups.create([
     {
       name,
-      campaign: `customers/${cleanId}/campaigns/${campaignId}`,
+      campaign: `customers/${cleanId}/campaigns/${numericId(campaignId, "campaign_id")}`,
       status: enums.AdGroupStatus.ENABLED,
       type: enums.AdGroupType.SEARCH_STANDARD,
       cpc_bid_micros: Math.round(cpcBid * 1_000_000),
@@ -100,7 +101,7 @@ export async function updateAdGroup(
   updates: { name?: string; cpcBid?: number; status?: string }
 ): Promise<string> {
   const customer = getCustomer(customerId);
-  const resourceName = `customers/${customerId.replace(/-/g, "")}/adGroups/${adGroupId}`;
+  const resourceName = `customers/${customerId.replace(/-/g, "")}/adGroups/${numericId(adGroupId, "ad_group_id")}`;
   const changes: string[] = [];
 
   const updateData: any = { resource_name: resourceName };
@@ -133,7 +134,7 @@ export async function pauseAdGroup(
 
   await customer.adGroups.update([
     {
-      resource_name: `customers/${customerId.replace(/-/g, "")}/adGroups/${adGroupId}`,
+      resource_name: `customers/${customerId.replace(/-/g, "")}/adGroups/${numericId(adGroupId, "ad_group_id")}`,
       status: enums.AdGroupStatus.PAUSED,
     },
   ]);
@@ -149,7 +150,7 @@ export async function deleteAdGroup(
 
   await customer.adGroups.update([
     {
-      resource_name: `customers/${customerId.replace(/-/g, "")}/adGroups/${adGroupId}`,
+      resource_name: `customers/${customerId.replace(/-/g, "")}/adGroups/${numericId(adGroupId, "ad_group_id")}`,
       status: enums.AdGroupStatus.REMOVED,
     },
   ]);

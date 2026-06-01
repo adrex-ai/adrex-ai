@@ -1,5 +1,6 @@
 import { GoogleAdsApi, enums } from "google-ads-api";
 import { loadGoogleAdsCredentials } from "../../auth/google-oauth.js";
+import { numericId } from "../../utils/validate.js";
 
 function getCustomer(customerId: string) {
   const creds = loadGoogleAdsCredentials();
@@ -36,7 +37,7 @@ export async function listAds(
       metrics.cost_micros,
       metrics.ctr
     FROM ad_group_ad
-    WHERE ad_group.id = ${adGroupId}
+    WHERE ad_group.id = ${numericId(adGroupId, "ad_group_id")}
       AND ad_group_ad.status != 'REMOVED'
     ORDER BY ad_group_ad.ad.id
   `);
@@ -92,7 +93,7 @@ export async function createResponsiveSearchAd(
 
   const result = await customer.adGroupAds.create([
     {
-      ad_group: `customers/${cleanId}/adGroups/${adGroupId}`,
+      ad_group: `customers/${cleanId}/adGroups/${numericId(adGroupId, "ad_group_id")}`,
       status: enums.AdGroupAdStatus.PAUSED,
       ad: {
         responsive_search_ad: {
@@ -130,7 +131,7 @@ export async function pauseAd(
 
   await customer.adGroupAds.update([
     {
-      resource_name: `customers/${cleanId}/adGroupAds/${adGroupId}~${adId}`,
+      resource_name: `customers/${cleanId}/adGroupAds/${numericId(adGroupId, "ad_group_id")}~${numericId(adId, "ad_id")}`,
       status: enums.AdGroupAdStatus.PAUSED,
     },
   ]);
@@ -148,7 +149,7 @@ export async function enableAd(
 
   await customer.adGroupAds.update([
     {
-      resource_name: `customers/${cleanId}/adGroupAds/${adGroupId}~${adId}`,
+      resource_name: `customers/${cleanId}/adGroupAds/${numericId(adGroupId, "ad_group_id")}~${numericId(adId, "ad_id")}`,
       status: enums.AdGroupAdStatus.ENABLED,
     },
   ]);
@@ -166,7 +167,7 @@ export async function deleteAd(
 
   await customer.adGroupAds.update([
     {
-      resource_name: `customers/${cleanId}/adGroupAds/${adGroupId}~${adId}`,
+      resource_name: `customers/${cleanId}/adGroupAds/${numericId(adGroupId, "ad_group_id")}~${numericId(adId, "ad_id")}`,
       status: enums.AdGroupAdStatus.REMOVED,
     },
   ]);

@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import http from "http";
 import open from "open";
 import { URL } from "url";
@@ -55,7 +56,10 @@ export async function startMetaOAuthFlow(
   const redirectUri = "http://localhost:9877/callback";
   const scopes = "ads_management,ads_read,business_management";
 
-  const authUrl = `https://www.facebook.com/v21.0/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scopes}&response_type=code`;
+  // CSRF protection: a random state must round-trip through the OAuth provider.
+  const state = crypto.randomBytes(16).toString("hex");
+
+  const authUrl = `https://www.facebook.com/v21.0/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scopes}&response_type=code&state=${state}`;
 
   return new Promise((resolve, reject) => {
     const server = http.createServer(async (req, res) => {
@@ -63,6 +67,14 @@ export async function startMetaOAuthFlow(
 
       const url = new URL(req.url, "http://localhost:9877");
       const code = url.searchParams.get("code");
+
+      if (url.searchParams.get("state") !== state) {
+        res.writeHead(400);
+        res.end("Invalid OAuth state — request rejected.");
+        server.close();
+        reject(new Error("OAuth state mismatch — possible CSRF, request rejected"));
+        return;
+      }
 
       if (!code) {
         res.writeHead(400);

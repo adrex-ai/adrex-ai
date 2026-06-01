@@ -1,43 +1,4 @@
-import { loadMetaAdsCredentials } from "../../auth/meta-oauth.js";
-
-const GRAPH_URL = "https://graph.facebook.com/v21.0";
-
-async function metaGet(path: string, params: Record<string, string> = {}): Promise<any> {
-  const creds = loadMetaAdsCredentials();
-  const queryParams = new URLSearchParams({ access_token: creds.accessToken!, ...params });
-  const response = await fetch(`${GRAPH_URL}${path}?${queryParams}`);
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error?.message || response.statusText);
-  }
-  return response.json();
-}
-
-async function metaPost(path: string, body: Record<string, any> = {}): Promise<any> {
-  const creds = loadMetaAdsCredentials();
-  const response = await fetch(`${GRAPH_URL}${path}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ access_token: creds.accessToken!, ...body }),
-  });
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error?.message || response.statusText);
-  }
-  return response.json();
-}
-
-async function metaDelete(path: string): Promise<any> {
-  const creds = loadMetaAdsCredentials();
-  const response = await fetch(`${GRAPH_URL}${path}?access_token=${creds.accessToken!}`, {
-    method: "DELETE",
-  });
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error?.message || response.statusText);
-  }
-  return response.json();
-}
+import { metaGet, metaPost, metaDelete } from "../../utils/meta-client.js";
 
 export async function listAdSets(
   campaignId: string

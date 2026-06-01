@@ -1,4 +1,5 @@
 import { google } from "googleapis";
+import crypto from "crypto";
 import http from "http";
 import open from "open";
 import { URL } from "url";
@@ -50,10 +51,14 @@ export async function startGoogleOAuthFlow(
     "http://localhost:9876/callback"
   );
 
+  // CSRF protection: a random state must round-trip through the OAuth provider.
+  const state = crypto.randomBytes(16).toString("hex");
+
   const authUrl = oauth2Client.generateAuthUrl({
     access_type: "offline",
     scope: SCOPES,
     prompt: "consent",
+    state,
   });
 
   return new Promise((resolve, reject) => {
@@ -62,6 +67,14 @@ export async function startGoogleOAuthFlow(
 
       const url = new URL(req.url, "http://localhost:9876");
       const code = url.searchParams.get("code");
+
+      if (url.searchParams.get("state") !== state) {
+        res.writeHead(400);
+        res.end("Invalid OAuth state — request rejected.");
+        server.close();
+        reject(new Error("OAuth state mismatch — possible CSRF, request rejected"));
+        return;
+      }
 
       if (!code) {
         res.writeHead(400);

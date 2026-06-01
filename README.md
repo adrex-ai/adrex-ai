@@ -8,7 +8,7 @@
   </p>
   <p align="center">
     <a href="#quick-start">Quick Start</a> |
-    <a href="#tools">56 Tools</a> |
+    <a href="#tools">54 Tools</a> |
     <a href="https://adrex.ai">Platform</a> |
     <a href="https://discord.gg/adrex">Discord</a>
   </p>
@@ -107,7 +107,7 @@ See [docs/setup-meta.md](docs/setup-meta.md) for detailed steps.
 
 ## Tools
 
-### Google Ads (30 tools)
+### Google Ads (28 tools)
 
 #### Campaigns
 | Tool | Description |

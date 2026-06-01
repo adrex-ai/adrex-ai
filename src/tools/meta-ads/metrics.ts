@@ -1,17 +1,4 @@
-import { loadMetaAdsCredentials } from "../../auth/meta-oauth.js";
-
-const GRAPH_URL = "https://graph.facebook.com/v21.0";
-
-async function metaGet(path: string, params: Record<string, string> = {}): Promise<any> {
-  const creds = loadMetaAdsCredentials();
-  const queryParams = new URLSearchParams({ access_token: creds.accessToken!, ...params });
-  const response = await fetch(`${GRAPH_URL}${path}?${queryParams}`);
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error?.message || response.statusText);
-  }
-  return response.json();
-}
+import { metaGet } from "../../utils/meta-client.js";
 
 export async function campaignPerformance(
   adAccountId: string,

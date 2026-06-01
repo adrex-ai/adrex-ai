@@ -1,17 +1,4 @@
-import { loadMetaAdsCredentials } from "../../auth/meta-oauth.js";
-
-const GRAPH_URL = "https://graph.facebook.com/v21.0";
-
-async function metaGet(path: string, params: Record<string, string> = {}): Promise<any> {
-  const creds = loadMetaAdsCredentials();
-  const queryParams = new URLSearchParams({ access_token: creds.accessToken!, ...params });
-  const response = await fetch(`${GRAPH_URL}${path}?${queryParams}`);
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error?.message || response.statusText);
-  }
-  return response.json();
-}
+import { metaGet, metaPost } from "../../utils/meta-client.js";
 
 export async function searchInterests(query: string): Promise<string> {
   const data = await metaGet("/search", {
@@ -68,7 +55,6 @@ export async function updateTargeting(
     interests?: Array<{ id: string; name: string }>;
   }
 ): Promise<string> {
-  const creds = loadMetaAdsCredentials();
   const changes: string[] = [];
 
   const targetingSpec: Record<string, any> = {};
@@ -94,19 +80,7 @@ export async function updateTargeting(
     changes.push(`- Interests → ${targeting.interests.map(i => i.name).join(", ")}`);
   }
 
-  const response = await fetch(`${GRAPH_URL}/${adSetId}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      access_token: creds.accessToken!,
-      targeting: targetingSpec,
-    }),
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error?.message || response.statusText);
-  }
+  await metaPost(`/${adSetId}`, { targeting: targetingSpec });
 
   return `## Targeting Updated for Ad Set ${adSetId}\n\n${changes.join("\n")}`;
 }

@@ -1,0 +1,67 @@
+{
+  "name": "adrex-ai",
+  "version": "1.0.0",
+  "description": "Open-source MCP server for managing Google Ads & Meta Ads from AI assistants like Claude, ChatGPT, and Cursor. 60+ tools for campaign management, reporting, keywords, targeting, and more.",
+  "type": "module",
+  "bin": {
+    "adrex-ai": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "lint": "eslint src/",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "google-ads",
+    "meta-ads",
+    "facebook-ads",
+    "advertising",
+    "ppc",
+    "campaign-management",
+    "ai",
+    "claude",
+    "chatgpt",
+    "cursor",
+    "marketing",
+    "ads-api",
+    "performance-marketing"
+  ],
+  "author": "Adrex AI <info@adrex.ai>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/adrex-ai/adrex-ai.git"
+  },
+  "homepage": "https://adrex.ai",
+  "bugs": {
+    "url": "https://github.com/adrex-ai/adrex-ai/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "google-ads-api": "^17.0.0",
+    "facebook-nodejs-business-sdk": "^21.0.0",
+    "googleapis": "^144.0.0",
+    "open": "^10.1.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "eslint": "^9.0.0"
+  },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ]
+}

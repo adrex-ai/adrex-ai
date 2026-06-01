@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "adrex-ai": {
+      "command": "npx",
+      "args": ["-y", "adrex-ai"],
+      "env": {
+        "GOOGLE_ADS_CLIENT_ID": "your-google-client-id",
+        "GOOGLE_ADS_CLIENT_SECRET": "your-google-client-secret",
+        "GOOGLE_ADS_DEVELOPER_TOKEN": "your-developer-token",
+        "GOOGLE_ADS_REFRESH_TOKEN": "your-refresh-token",
+        "META_ADS_APP_ID": "your-meta-app-id",
+        "META_ADS_APP_SECRET": "your-meta-app-secret",
+        "META_ADS_ACCESS_TOKEN": "your-meta-access-token"
+      }
+    }
+  }
+}

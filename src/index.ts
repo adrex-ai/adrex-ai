@@ -2,19 +2,25 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { setGlobalDispatcher, EnvHttpProxyAgent } from "undici";
 import { z } from "zod";
 
 import { getProxyConfig, proxyToolCall, getProxyStatus } from "./utils/proxy.js";
 
-// Node's built-in fetch (undici) ignores HTTP(S)_PROXY env vars by default.
-// In proxied/corporate networks that makes every outbound call fail. Route
-// fetch through the proxy when one is configured.
-if (
-  process.env.HTTPS_PROXY || process.env.HTTP_PROXY ||
-  process.env.https_proxy || process.env.http_proxy
-) {
-  setGlobalDispatcher(new EnvHttpProxyAgent());
+// Node's built-in fetch ignores HTTP(S)_PROXY env vars by default. In proxied/
+// corporate networks that makes outbound calls fail. We route fetch through the
+// proxy ONLY when one is configured — and load `undici` lazily so the package
+// never imports it (and can't crash on older Node) when no proxy is in play.
+async function configureProxy(): Promise<void> {
+  const hasProxy =
+    process.env.HTTPS_PROXY || process.env.HTTP_PROXY ||
+    process.env.https_proxy || process.env.http_proxy;
+  if (!hasProxy) return;
+  try {
+    const { setGlobalDispatcher, EnvHttpProxyAgent } = await import("undici");
+    setGlobalDispatcher(new EnvHttpProxyAgent());
+  } catch (err: any) {
+    console.error(`Proxy setup skipped (${err?.message}). Set Node >= 18.17 if you are behind a proxy.`);
+  }
 }
 
 const proxyConfig = getProxyConfig();
@@ -42,7 +48,7 @@ function makeHandler(toolName: string) {
 
 const server = new McpServer({
   name: "adrex-ai",
-  version: "1.0.7",
+  version: "1.0.8",
 });
 
 function tool(
@@ -404,6 +410,7 @@ server.registerTool(
 // ─── Start Server ─────────────────────────────────────────────────────────────
 
 async function main() {
+  await configureProxy();
   const transport = new StdioServerTransport();
   await server.connect(transport);
   console.error(

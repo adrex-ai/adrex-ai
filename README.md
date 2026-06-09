@@ -4,7 +4,7 @@
     <strong>MCP server for Google Ads & Meta Ads</strong>
   </p>
   <p align="center">
-    Manage your ad campaigns from Claude, ChatGPT, Cursor, or any MCP-compatible AI assistant.
+    Manage your ad campaigns from Claude Code, Cursor, Codex, Gemini, or any MCP client.
   </p>
   <p align="center">
     <a href="#quick-start">Quick Start</a> |
@@ -48,8 +48,19 @@ Sign up at **[adrex.ai](https://adrex.ai)**, connect your Google/Meta ad account
 
 ### 2. Add the server to your AI assistant
 
-**Claude Desktop** (`~/Library/Application Support/Claude/claude_desktop_config.json`)
-or **Cursor** (`.cursor/mcp.json`):
+Adrex ships a standard **stdio MCP server**, so it works with **any MCP client**. Pick yours below — every config points at `npx -y adrex-ai` with your `ADREX_API_KEY`.
+
+**Claude Code:**
+```bash
+claude mcp add -s user adrex-ai -e ADREX_API_KEY=your-api-key -- npx -y adrex-ai
+```
+
+**Gemini CLI:**
+```bash
+gemini mcp add adrex-ai -e ADREX_API_KEY=your-api-key -- npx -y adrex-ai
+```
+
+**Claude Desktop** (`~/Library/Application Support/Claude/claude_desktop_config.json`), **Cursor** (`~/.cursor/mcp.json` global or `.cursor/mcp.json` per-project), **Gemini CLI** (`~/.gemini/settings.json`), or any client using the JSON `mcpServers` format:
 
 ```json
 {
@@ -65,10 +76,16 @@ or **Cursor** (`.cursor/mcp.json`):
 }
 ```
 
-**Claude Code:**
-```bash
-claude mcp add adrex-ai -e ADREX_API_KEY=your-api-key -- npx -y adrex-ai
+**Codex** (`~/.codex/config.toml`) — note Codex uses TOML, not JSON:
+
+```toml
+[mcp_servers.adrex-ai]
+command = "npx"
+args = ["-y", "adrex-ai"]
+env = { ADREX_API_KEY = "your-api-key" }
 ```
+
+**Any other MCP client** (Cline, Windsurf, Zed, Continue, …): point it at command `npx -y adrex-ai` with env `ADREX_API_KEY` set to your key.
 
 That's it — no SDK setup, no developer tokens, no OAuth juggling. The server forwards each request to the Adrex backend, which uses the ad-account credentials you connected in the dashboard.
 

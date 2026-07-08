@@ -1,10 +1,15 @@
 <p align="center">
   <h1 align="center">Adrex AI</h1>
   <p align="center">
-    <strong>MCP server for Google Ads & Meta Ads</strong>
+    <strong>Open-source MCP server for Google Ads &amp; Meta Ads</strong>
   </p>
   <p align="center">
-    Manage your ad campaigns from Claude Code, Cursor, Codex, Gemini, or any MCP client.
+    Manage your ad campaigns in plain English from Claude Code, Cursor, Codex, Gemini, or any MCP client.
+  </p>
+  <p align="center">
+    <a href="https://www.npmjs.com/package/adrex-ai"><img src="https://img.shields.io/npm/v/adrex-ai?color=8b5cf6" alt="npm version"></a>
+    <a href="https://www.npmjs.com/package/adrex-ai"><img src="https://img.shields.io/npm/dm/adrex-ai?color=06b6d4" alt="npm downloads"></a>
+    <a href="LICENSE"><img src="https://img.shields.io/npm/l/adrex-ai" alt="MIT license"></a>
   </p>
   <p align="center">
     <a href="#quick-start">Quick Start</a> |
@@ -18,7 +23,9 @@
 
 ## What is Adrex AI?
 
-Adrex AI is an MCP (Model Context Protocol) server that connects AI assistants to your Google Ads and Meta Ads accounts. Instead of navigating complex dashboards, you manage campaigns through natural language.
+Adrex AI is an **open-source MCP (Model Context Protocol) server** that connects AI assistants to your **Google Ads and Meta Ads** accounts. Instead of navigating complex dashboards, you manage campaigns, reporting, keywords, and targeting through natural language — from Claude, Cursor, Codex, or any MCP client.
+
+> **Platforms:** Google Ads and Meta Ads (Facebook & Instagram) today — TikTok and LinkedIn coming soon.
 
 ```
 You: "Show me my Google Ads performance for the last 7 days"
@@ -31,7 +38,7 @@ You: "Create a Meta campaign for our summer sale, $50/day budget"
 Claude: [calls meta_ads_create_campaign] → campaign created PAUSED for your review
 ```
 
-You connect your ad accounts once in the [Adrex dashboard](https://adrex.ai) (secure OAuth — your tokens stay on our servers, never in the MCP client), then drive everything from your AI assistant with a single API key.
+You connect your ad accounts once in the [Adrex dashboard](https://adrex.ai) (secure OAuth — your tokens stay on our servers, never in the MCP client), then drive everything from your AI assistant. There are **two ways to connect** (see [Quick Start](#quick-start)): a **remote server with browser sign-in — no API key**, or this **npx server with an API key**.
 
 ### Safety First
 
@@ -43,12 +50,31 @@ These tools operate on **real ad accounts** that spend **real money**:
 
 ## Quick Start
 
-### 1. Get your API key
-Sign up at **[adrex.ai](https://adrex.ai)**, connect your Google/Meta ad accounts in **Settings**, and generate an **API key**.
+First, sign up at **[adrex.ai](https://adrex.ai)** and connect your Google/Meta ad accounts in **Settings**. Then pick one of the two ways to connect.
 
-### 2. Add the server to your AI assistant
+### Option A — Remote server (recommended, no API key)
 
-Adrex ships a standard **stdio MCP server**, so it works with **any MCP client**. Pick yours below — every config points at `npx -y adrex-ai` with your `ADREX_API_KEY`.
+Connect over HTTP and authorize in your browser — nothing to copy or paste. Your client stores its own secure token. In the Adrex dashboard, **Settings → Connect to your AI (MCP)** shows a one-command connect with your server URL. It looks like:
+
+**Claude Code:**
+```bash
+claude mcp add --transport http adrex-ai https://<your-adrex-server>/mcp
+```
+
+**Claude Desktop / Cursor / VS Code / other clients** (JSON) — or use the one-click **Add to Cursor / Add to VS Code** buttons in Settings:
+```json
+{
+  "mcpServers": {
+    "adrex-ai": { "type": "http", "url": "https://<your-adrex-server>/mcp" }
+  }
+}
+```
+
+After adding, your client opens a browser tab — sign in and click **Authorize**. Done.
+
+### Option B — npx server with an API key
+
+Prefer the classic stdio server? Generate an **API key** in **Settings**, then add it below. Adrex ships a standard **stdio MCP server**, so it works with **any MCP client** — every config points at `npx -y adrex-ai` with your `ADREX_API_KEY`.
 
 **Claude Code:**
 ```bash

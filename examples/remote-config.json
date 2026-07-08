@@ -1,0 +1,9 @@
+{
+  "_comment": "Remote (recommended) — no API key. Your client authorizes in the browser and stores its own token. Replace the URL with the one shown in Adrex → Settings → Connect to your AI (MCP). Works in Claude Desktop, Cursor, VS Code, and any client that supports HTTP MCP servers.",
+  "mcpServers": {
+    "adrex-ai": {
+      "type": "http",
+      "url": "https://<your-adrex-server>/mcp"
+    }
+  }
+}

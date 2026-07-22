@@ -1,0 +1,36 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.adrex-ai/adrex-ai",
+  "title": "Adrex AI",
+  "description": "Open-source MCP server for Google Ads & Meta Ads — manage campaigns from any AI assistant.",
+  "websiteUrl": "https://adrex.ai",
+  "repository": {
+    "url": "https://github.com/adrex-ai/adrex-ai",
+    "source": "github"
+  },
+  "version": "1.0.11",
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "adrex-ai",
+      "version": "1.0.11",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "ADREX_API_KEY",
+          "description": "Your Adrex API key from https://adrex.ai/settings (after connecting your ad accounts).",
+          "isRequired": true,
+          "isSecret": true
+        },
+        {
+          "name": "ADREX_API_URL",
+          "description": "Optional override for the Adrex backend API URL. Defaults to the Adrex hosted API.",
+          "isRequired": false
+        }
+      ]
+    }
+  ]
+}

@@ -5,3 +5,6 @@ dist/
 .DS_Store
 credentials.json
 token.json
+
+# local publisher binary
+mcp-publisher

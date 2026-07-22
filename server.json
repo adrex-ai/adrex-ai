@@ -1,6 +1,6 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.adrex-ai/adrex-ai",
+  "name": "io.github.gauravapiscean/adrex-ai",
   "title": "Adrex AI",
   "description": "Open-source MCP server for Google Ads & Meta Ads — manage campaigns from any AI assistant.",
   "websiteUrl": "https://adrex.ai",
@@ -8,13 +8,13 @@
     "url": "https://github.com/adrex-ai/adrex-ai",
     "source": "github"
   },
-  "version": "1.0.11",
+  "version": "1.0.12",
   "packages": [
     {
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "adrex-ai",
-      "version": "1.0.11",
+      "version": "1.0.12",
       "transport": {
         "type": "stdio"
       },

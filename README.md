@@ -23,9 +23,9 @@
 
 ## What is Adrex AI?
 
-Adrex AI is an **open-source MCP (Model Context Protocol) server** that connects AI assistants to your **Google Ads and Meta Ads** accounts. Instead of navigating complex dashboards, you manage campaigns, reporting, keywords, and targeting through natural language — from Claude, Cursor, Codex, or any MCP client.
+Adrex AI is an **open-source MCP (Model Context Protocol) server** that connects AI assistants to your **Google Ads** account, with **Meta Ads** coming soon. Instead of navigating complex dashboards, you manage campaigns, reporting, keywords, and targeting through natural language — from Claude, Cursor, Codex, or any MCP client.
 
-> **Platforms:** Google Ads and Meta Ads (Facebook & Instagram) today — TikTok and LinkedIn coming soon.
+> **Platforms:** Google Ads today — Meta Ads (Facebook & Instagram), TikTok, and LinkedIn coming soon.
 
 ```
 You: "Show me my Google Ads performance for the last 7 days"

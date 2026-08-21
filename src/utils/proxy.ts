@@ -1,4 +1,4 @@
-const DEFAULT_API_URL = "https://adrex-ai-76820518704.us-central1.run.app/api/v1";
+const DEFAULT_API_URL = "https://api.adrex.ai/api/v1";
 
 export interface AdrexProxyConfig {
   apiKey: string;

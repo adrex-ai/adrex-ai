@@ -23,9 +23,9 @@
 
 ## What is Adrex AI?
 
-Adrex AI is an **open-source MCP (Model Context Protocol) server** that connects AI assistants to your **Google Ads** account, with **Meta Ads** coming soon. Instead of navigating complex dashboards, you manage campaigns, reporting, keywords, and targeting through natural language — from Claude, Cursor, Codex, or any MCP client.
+Adrex AI is an **open-source MCP (Model Context Protocol) server** that connects AI assistants to your **Google Ads** and **Meta Ads** accounts. Instead of navigating complex dashboards, you manage campaigns, reporting, keywords, and targeting through natural language — from Claude, Cursor, Codex, or any MCP client.
 
-> **Platforms:** Google Ads today — Meta Ads (Facebook & Instagram), TikTok, and LinkedIn coming soon.
+> **Platforms:** Google Ads and Meta Ads (Facebook & Instagram) today — TikTok and LinkedIn coming soon.
 
 ```
 You: "Show me my Google Ads performance for the last 7 days"
@@ -70,7 +70,11 @@ claude mcp add --transport http adrex-ai https://<your-adrex-server>/mcp
 }
 ```
 
-After adding, your client opens a browser tab — sign in and click **Authorize**. Done.
+After adding, your client opens a browser tab — sign in and click **Authorize**. The consent screen shows **which Adrex account** you're authorizing as; if a different account is already signed in on that browser, use **Not you? Switch** before approving.
+
+You can see and revoke every connected app in **Settings → Connect to your AI → Connected AI apps**.
+
+> **Connected the wrong account?** Every tool will report "Not connected" even though your ad accounts are linked. Revoke the app in Settings, then re-authorize. Note that re-running `claude mcp add` does nothing once the server is configured (`already exists in local config`) — instead run `/mcp` in Claude Code, pick `adrex-ai`, and clear authentication.
 
 ### Option B — npx server with an API key
 

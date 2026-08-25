@@ -46,10 +46,36 @@ function makeHandler(toolName: string) {
   };
 }
 
-const server = new McpServer({
-  name: "adrex-ai",
-  version: "1.0.8",
-});
+// Sent to the client on initialize. The reader is a marketing manager running
+// their own ad accounts, not an analyst — this sets what a useful answer looks
+// like for them. Keep in sync with SERVER_INSTRUCTIONS in the backend's
+// mcp_http.py, which serves the same tools over the remote transport.
+const INSTRUCTIONS = `Adrex AI — the user's live Google Ads and Meta Ads accounts.
+
+You are talking to the person responsible for these campaigns and their budget.
+They want to know what to do next, not to read a metrics dump.
+
+- Lead with the answer in one sentence, then the supporting numbers.
+- Always state the date window; every tool takes a \`days\` parameter (default 30).
+- Speak in money and outcomes — spend, cost per conversion, ROAS, wasted spend —
+  rather than impressions and clicks, unless they asked about reach.
+- Tool results include a "Worth a look" section of flagged facts. Use it: it is
+  where budget caps, zero-conversion spend, and delivery problems surface.
+- Under ~30 conversions the numbers are noisy. Say so instead of over-reading a
+  CPA swing.
+- Never invent benchmarks or industry averages. Compare campaigns to each other,
+  to their own history, or to a target the user gave you.
+- Writes (budgets, pausing, new campaigns) change a live account and spend real
+  money. Confirm the specific change and the campaign it applies to before
+  calling a write tool, and report exactly what the platform accepted.`;
+
+const server = new McpServer(
+  {
+    name: "adrex-ai",
+    version: "1.0.14",
+  },
+  { instructions: INSTRUCTIONS }
+);
 
 function tool(
   name: string,
@@ -63,14 +89,16 @@ function tool(
 
 tool("google_ads_list_accounts", "List all accessible Google Ads accounts", {});
 
-tool("google_ads_list_campaigns", "List all campaigns for a Google Ads account with performance metrics", {
+tool("google_ads_list_campaigns", "List all campaigns for a Google Ads account with spend, conversions, CPA and ROAS over a chosen window", {
   customer_id: z.string().describe("Google Ads customer/account ID"),
   status: z.string().optional().describe("Filter by status: ENABLED, PAUSED"),
+  days: z.number().default(30).describe("Metrics lookback window in days (default 30)"),
 });
 
-tool("google_ads_get_campaign", "Get detailed information and metrics for a specific Google Ads campaign", {
+tool("google_ads_get_campaign", "Get detailed metrics for one Google Ads campaign over a chosen window", {
   customer_id: z.string().describe("Google Ads customer/account ID"),
   campaign_id: z.string().describe("Campaign ID"),
+  days: z.number().default(30).describe("Metrics lookback window in days (default 30)"),
 });
 
 tool("google_ads_create_search_campaign", "Create a new Google Ads Search campaign. Campaign is created PAUSED for safety — no money will be spent until you resume it.", {
@@ -236,13 +264,15 @@ tool("google_ads_get_budget", "Get budget details for a Google Ads campaign", {
 
 tool("meta_ads_list_accounts", "List all accessible Meta (Facebook) ad accounts", {});
 
-tool("meta_ads_list_campaigns", "List all campaigns for a Meta ad account with performance metrics", {
+tool("meta_ads_list_campaigns", "List all campaigns for a Meta ad account with spend, conversions, CPA and ROAS over a chosen window", {
   ad_account_id: z.string().describe("Meta ad account ID (with or without act_ prefix)"),
   status: z.string().optional().describe("Filter by status: ACTIVE, PAUSED"),
+  days: z.number().default(30).describe("Metrics lookback window in days (default 30)"),
 });
 
-tool("meta_ads_get_campaign", "Get detailed information and metrics for a specific Meta campaign", {
+tool("meta_ads_get_campaign", "Get detailed metrics for one Meta campaign over a chosen window", {
   campaign_id: z.string().describe("Meta campaign ID"),
+  days: z.number().default(30).describe("Metrics lookback window in days (default 30)"),
 });
 
 tool("meta_ads_create_campaign", "Create a new Meta Ads campaign. Created PAUSED for safety — no money spent until you activate it.", {

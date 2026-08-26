@@ -13,7 +13,7 @@
   </p>
   <p align="center">
     <a href="#quick-start">Quick Start</a> |
-    <a href="#tools">54 Tools</a> |
+    <a href="#tools">62 Tools</a> |
     <a href="https://adrex.ai">Platform</a> |
     <a href="https://discord.gg/adrex">Discord</a>
   </p>
@@ -123,7 +123,7 @@ That's it — no SDK setup, no developer tokens, no OAuth juggling. The server f
 
 ## Tools
 
-### Google Ads (28 tools)
+### Google Ads (34 tools)
 
 #### Campaigns
 | Tool | Description |
@@ -173,7 +173,17 @@ That's it — no SDK setup, no developer tokens, no OAuth juggling. The server f
 | `google_ads_auction_insights` | Competitive auction metrics |
 | `google_ads_get_budget` | Campaign budget details |
 
-### Meta Ads (25 tools)
+#### Analysis
+| Tool | Description |
+|---|---|
+| `google_ads_keyword_performance` | Rank keywords by return — which keywords made the most money |
+| `google_ads_keyword_insights` | Full keyword audit in one call: blocking negatives, wasted-spend themes, missing keywords, Quality Score premiums, budget vs Ad Rank caps, duplicates |
+| `google_ads_ad_performance` | Rank ads by return — which ad copy actually converts |
+| `google_ads_search_terms` | What people actually searched, what it cost, and which terms spent with nothing to show |
+| `google_ads_conversion_health` | Check conversion tracking is working before trusting any CPA or ROAS |
+| `google_ads_recent_changes` | Who changed what recently — most sudden shifts are something someone did |
+
+### Meta Ads (26 tools)
 
 #### Campaigns
 | Tool | Description |
@@ -219,11 +229,13 @@ That's it — no SDK setup, no developer tokens, no OAuth juggling. The server f
 | `meta_ads_campaign_performance` | Performance summary across campaigns |
 | `meta_ads_time_series` | Daily performance time series |
 | `meta_ads_breakdowns` | Breakdowns by device, platform, age, gender |
+| `meta_ads_creative_performance` | Rank ads by return — which creative made money, and which spent for nothing |
 
-### Cross-Platform (1 tool)
+### Cross-Platform (2 tools)
 | Tool | Description |
 |---|---|
-| `list_connected_platforms` | Check which platforms are connected and your usage |
+| `account_review` | One call for "how are we doing" — every campaign across Google and Meta, with ranked findings |
+| `campaign_diagnosis` | Why performance moved: compares the window against the one before and attributes the change |
 
 ## Use Cases
 

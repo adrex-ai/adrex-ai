@@ -2,7 +2,7 @@
   "name": "adrex-ai",
   "version": "1.2.0",
   "mcpName": "io.github.gauravapiscean/adrex-ai",
-  "description": "Open-source MCP server for managing Google Ads & Meta Ads from AI assistants like Claude, ChatGPT, and Cursor. 54 tools for campaign management, reporting, keywords, targeting, and more.",
+  "description": "Open-source MCP server for managing Google Ads & Meta Ads from AI assistants like Claude, ChatGPT, and Cursor. 62 tools for campaign management, reporting, keywords, targeting, and more.",
   "type": "module",
   "bin": {
     "adrex-ai": "dist/index.js"

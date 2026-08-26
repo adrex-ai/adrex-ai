@@ -67,12 +67,28 @@ They want to know what to do next, not to read a metrics dump.
   to their own history, or to a target the user gave you.
 - Writes (budgets, pausing, new campaigns) change a live account and spend real
   money. Confirm the specific change and the campaign it applies to before
-  calling a write tool, and report exactly what the platform accepted.`;
+  calling a write tool, and report exactly what the platform accepted.
+
+Reach for the right tool rather than assembling an answer from tables:
+- "How are we doing?" / "What needs attention?" -> \`account_review\` first.
+- "Why did CPA/conversions change?" -> \`campaign_diagnosis\`. It compares the
+  window against the one before it and attributes the move to cost-per-click vs
+  conversion rate. Do not speculate about causes without it.
+- "Which keyword/ad/search term made the most money?" ->
+  \`google_ads_keyword_performance\`, \`google_ads_ad_performance\`,
+  \`google_ads_search_terms\`, \`meta_ads_creative_performance\`. They already apply a
+  conversion floor and say what they held back — repeat that caveat, do not drop it.
+- Numbers look impossible, or CPA/ROAS are missing everywhere ->
+  \`google_ads_conversion_health\` before concluding the campaigns are failing.
+- Performance moved suddenly -> \`google_ads_recent_changes\`. Most sudden shifts
+  are something someone did.
+
+End with one recommended next action and what it is worth, not a list of options.`;
 
 const server = new McpServer(
   {
     name: "adrex-ai",
-    version: "1.0.14",
+    version: "1.1.0",
   },
   { instructions: INSTRUCTIONS }
 );
@@ -401,6 +417,64 @@ tool("meta_ads_time_series", "Get daily performance time series for a Meta campa
 tool("meta_ads_breakdowns", "Get campaign breakdowns by device, platform, placement, age, or gender", {
   campaign_id: z.string().describe("Meta campaign ID"),
   breakdown_type: z.enum(["device_platform", "publisher_platform", "platform_position", "age", "gender"]).default("device_platform").describe("Breakdown dimension"),
+});
+
+tool("meta_ads_creative_performance", "Rank Meta ads by return — which creative actually made money, with the ones spending for nothing called out", {
+  ad_account_id: z.string().describe("Meta ad account ID"),
+  ad_set_id: z.string().optional().describe("Restrict to one ad set"),
+  sort_by: z.enum(["revenue", "roas", "conversions", "cost", "cpa"]).default("revenue").describe("Ranking metric"),
+  limit: z.number().default(20).describe("How many to return (default 20)"),
+});
+
+// ─── Insight: what made money, why it moved, what changed ─────────────────────
+
+tool("google_ads_keyword_performance", "Rank keywords by return across a whole account or campaign — answers 'which keywords made the most money'. Excludes keywords with too few conversions to rank honestly, and falls back to cost-per-conversion when the account tracks no revenue.", {
+  customer_id: z.string().describe("Google Ads customer/account ID"),
+  campaign_id: z.string().optional().describe("Restrict to one campaign"),
+  ad_group_id: z.string().optional().describe("Restrict to one ad group"),
+  sort_by: z.enum(["revenue", "roas", "conversions", "cost", "cpa"]).default("revenue").describe("Ranking metric"),
+  days: z.number().default(30).describe("Lookback window in days (default 30)"),
+  limit: z.number().default(20).describe("How many to return (default 20)"),
+  min_conversions: z.number().default(5).describe("Conversion floor for ranking (default 5)"),
+});
+
+tool("google_ads_search_terms", "What people actually searched before clicking, what it cost, and which terms spent with nothing to show — the source list for negative keywords", {
+  customer_id: z.string().describe("Google Ads customer/account ID"),
+  campaign_id: z.string().optional().describe("Restrict to one campaign"),
+  sort_by: z.enum(["revenue", "roas", "conversions", "cost", "cpa"]).default("cost").describe("Ranking metric"),
+  days: z.number().default(30).describe("Lookback window in days (default 30)"),
+  limit: z.number().default(20).describe("How many to return (default 20)"),
+});
+
+tool("google_ads_ad_performance", "Rank ads by return across a campaign or account — which ad copy actually converts", {
+  customer_id: z.string().describe("Google Ads customer/account ID"),
+  campaign_id: z.string().optional().describe("Restrict to one campaign"),
+  ad_group_id: z.string().optional().describe("Restrict to one ad group"),
+  sort_by: z.enum(["revenue", "roas", "conversions", "cost", "cpa"]).default("revenue").describe("Ranking metric"),
+  days: z.number().default(30).describe("Lookback window in days (default 30)"),
+  limit: z.number().default(20).describe("How many to return (default 20)"),
+});
+
+tool("google_ads_conversion_health", "Check whether conversion tracking is actually working before trusting any CPA or ROAS number — which actions are enabled, firing, and carrying revenue", {
+  customer_id: z.string().describe("Google Ads customer/account ID"),
+  days: z.number().default(30).describe("Lookback window in days (default 30)"),
+});
+
+tool("google_ads_recent_changes", "Who changed what in the account recently. Use this when performance shifted suddenly — most sudden shifts are something someone did. Google only retains 30 days.", {
+  customer_id: z.string().describe("Google Ads customer/account ID"),
+  days: z.number().default(14).describe("Lookback window in days, max 30 (default 14)"),
+});
+
+tool("campaign_diagnosis", "Why a campaign's performance moved: compares the window against the one before it and attributes the change to cost-per-click vs conversion rate vs volume, with a confidence level. Use this instead of guessing when asked why something got better or worse.", {
+  campaign_id: z.string().describe("Campaign ID"),
+  platform: z.enum(["google", "meta"]).default("google").describe("Which platform the campaign is on"),
+  customer_id: z.string().optional().describe("Google Ads customer/account ID (required for Google)"),
+  ad_account_id: z.string().optional().describe("Meta ad account ID (Meta only)"),
+  days: z.number().default(30).describe("Window length in days; the same length before it is the baseline"),
+});
+
+tool("account_review", "One call for 'how are we doing' or 'what needs attention': every campaign across Google and Meta, ranked findings with the money at stake, and what to look at next. Start here rather than listing campaigns.", {
+  days: z.number().default(30).describe("Lookback window in days (default 30)"),
 });
 
 // ─── Cross-Platform ───────────────────────────────────────────────────────────

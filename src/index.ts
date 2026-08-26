@@ -88,7 +88,7 @@ End with one recommended next action and what it is worth, not a list of options
 const server = new McpServer(
   {
     name: "adrex-ai",
-    version: "1.1.0",
+    version: "1.2.0",
   },
   { instructions: INSTRUCTIONS }
 );
@@ -436,6 +436,12 @@ tool("google_ads_keyword_performance", "Rank keywords by return across a whole a
   days: z.number().default(30).describe("Lookback window in days (default 30)"),
   limit: z.number().default(20).describe("How many to return (default 20)"),
   min_conversions: z.number().default(5).describe("Conversion floor for ranking (default 5)"),
+});
+
+tool("google_ads_keyword_insights", "Full keyword audit in one call: negative keywords that are blocking searches which convert, themes of wasted spend to exclude, converting searches that need their own keyword, keywords paying a Quality Score premium, keywords capped by budget vs Ad Rank, match-type comparison, and duplicates. Use for 'audit my keywords', 'where am I wasting money', 'what should I add or exclude'.", {
+  customer_id: z.string().describe("Google Ads customer/account ID"),
+  campaign_id: z.string().optional().describe("Restrict to one campaign"),
+  days: z.number().default(30).describe("Lookback window in days (default 30)"),
 });
 
 tool("google_ads_search_terms", "What people actually searched before clicking, what it cost, and which terms spent with nothing to show — the source list for negative keywords", {
